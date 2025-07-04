@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Description Generator v2</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <i class="fas fa-rocket"></i>
+                    SEO Description Generator
+                </h1>
+                <p class="app-subtitle">AI-powered content generation following brand guidelines</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Input Section -->
+            <section class="input-section card">
+                <h2 class="section-title">
+                    <i class="fas fa-keyboard"></i>
+                    Input Configuration
+                </h2>
+                
+                <div class="form-group">
+                    <label for="pageNames" class="form-label">
+                        Page Names
+                        <span class="label-hint">Enter one page name per line (e.g., "Arsenal tickets", "Beyoncé tickets")</span>
+                    </label>
+                    <textarea 
+                        id="pageNames" 
+                        class="form-textarea"
+                        rows="6"
+                        placeholder="Arsenal tickets&#10;Beyoncé tickets&#10;Manchester United tickets"
+                    ></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="language" class="form-label">Language</label>
+                        <select id="language" class="form-select">
+                            <option value="English">English</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Italian">Italian</option>
+                            <option value="Portuguese">Portuguese</option>
+                            <option value="Dutch">Dutch</option>
+                            <option value="Russian">Russian</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="Chinese">Chinese</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="includeSearchVolume" checked>
+                            <span>Include Search Volume</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="includeCompetitorAnalysis">
+                            <span>Analyze Competitors</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="generateBtn" class="btn btn-primary">
+                    <i class="fas fa-magic"></i>
+                    Generate Descriptions
+                </button>
+            </section>
+
+            <!-- Processing Section -->
+            <section id="processingSection" class="processing-section card" style="display: none;">
+                <div class="processing-content">
+                    <div class="spinner"></div>
+                    <h3>Processing Your Request</h3>
+                    <p id="processingStatus">Initializing...</p>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cost Tracker -->
+            <section id="costTracker" class="cost-tracker card" style="display: none;">
+                <h3 class="cost-title">
+                    <i class="fas fa-coins"></i>
+                    Usage & Cost Tracking
+                </h3>
+                <div class="cost-grid">
+                    <div class="cost-item">
+                        <span class="cost-label">Input Tokens</span>
+                        <span class="cost-value" id="inputTokens">0</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Output Tokens</span>
+                        <span class="cost-value" id="outputTokens">0</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Total Tokens</span>
+                        <span class="cost-value" id="totalTokens">0</span>
+                    </div>
+                    <div class="cost-item highlight">
+                        <span class="cost-label">Estimated Cost</span>
+                        <span class="cost-value" id="totalCost">$0.00</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <h2 class="section-title">
+                    <i class="fas fa-file-alt"></i>
+                    Generated Descriptions
+                </h2>
+                <div id="resultsContainer" class="results-container"></div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 SEO Description Generator v2. Professional content generation tool.</p>
+        </footer>
+    </div>
+
+    <!-- Result Template -->
+    <template id="resultTemplate">
+        <div class="result-card card">
+            <div class="result-header">
+                <h3 class="result-title">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span class="page-name"></span>
+                </h3>
+                <button class="collapse-btn" aria-label="Toggle description">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            
+            <div class="result-meta">
+                <div class="meta-item">
+                    <i class="fas fa-search"></i>
+                    <span class="meta-label">Search Volume:</span>
+                    <span class="search-volume">--</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-file-word"></i>
+                    <span class="meta-label">Word Count:</span>
+                    <span class="word-count">--</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-coins"></i>
+                    <span class="meta-label">Cost:</span>
+                    <span class="generation-cost">--</span>
+                </div>
+            </div>
+
+            <div class="result-content">
+                <div class="description-container">
+                    <div class="description-text"></div>
+                    <button class="copy-btn" aria-label="Copy description">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                    </button>
+                </div>
+                <div class="competitor-insights" style="display: none;">
+                    <h4>Competitor Insights</h4>
+                    <div class="insights-content"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html> 
