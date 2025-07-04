@@ -106,69 +106,6 @@ class OpenAIService {
   }
 
   /**
-   * Build system prompt with brand guidelines
-   */
-  buildSystemPrompt(language) {
-    return `You are an expert SEO content writer for a ticket aggregation platform. Your task is to write compelling, SEO-optimized descriptions that follow these strict guidelines:
-
-BUSINESS MODEL:
-- ${BRAND_GUIDELINES.businessModel.description}
-- ${BRAND_GUIDELINES.businessModel.emphasis}
-
-TONE & VOICE:
-${BRAND_GUIDELINES.tone.characteristics.map(c => `- ${c}`).join('\n')}
-
-CONTENT REQUIREMENTS:
-- Length: ${BRAND_GUIDELINES.structure.length.min}-${BRAND_GUIDELINES.structure.length.max} words (STRICTLY ENFORCED)
-- Format: ${BRAND_GUIDELINES.structure.format.firstMention}
-- Style: ${BRAND_GUIDELINES.structure.format.evergreen}
-
-WRITING RULES:
-Must Include:
-${BRAND_GUIDELINES.style.include.map(i => `- ${i}`).join('\n')}
-
-Must Avoid:
-${BRAND_GUIDELINES.style.avoid.map(a => `- ${a}`).join('\n')}
-
-LANGUAGE:
-Write the entire description in ${language}. If not English, maintain the same professional tone and follow all guidelines while using natural expressions in the target language.
-
-FORMAT:
-- Use **bold** for the first mention of the main keyword
-- Write in a single flowing narrative without headers or sections
-- Ensure the content reads naturally while being SEO-optimized`;
-  }
-
-  /**
-   * Build user prompt with page name, search volume, and optional competitor insights
-   */
-  buildUserPrompt(pageName, competitorInsights, searchVolume = null) {
-    let prompt = `Write an SEO-optimized description for: "${pageName}"`;
-
-    // Include search volume data if available
-    if (searchVolume && searchVolume.searchVolume > 0) {
-      prompt += `\n\nSEO Data:
-- Monthly Search Volume: ${searchVolume.searchVolume.toLocaleString()}
-- Competition Level: ${searchVolume.competition}
-- Average CPC: $${searchVolume.cpc.toFixed(2)}
-
-This is a high-value keyword with significant search interest. Ensure the description is optimized for this search behavior.`;
-    }
-
-    if (competitorInsights) {
-      prompt += `\n\nCompetitor Analysis Insights:\n${competitorInsights}`;
-      prompt += `\n\nUse these insights to ensure our description covers important topics while maintaining our unique brand voice and perspective.`;
-    }
-
-    prompt += `\n\nRemember: 
-- Bold the first mention of "${pageName}"
-- Write exactly ${BRAND_GUIDELINES.structure.length.min}-${BRAND_GUIDELINES.structure.length.max} words
-- Focus on the fan experience and ticket-buying journey`;
-
-    return prompt;
-  }
-
-  /**
    * Analyze competitor content for insights
    */
   async analyzeCompetitorContent(keyword, competitorContent) {
