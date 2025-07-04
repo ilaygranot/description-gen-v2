@@ -19,133 +19,161 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <h1 class="app-title">
-                    <i class="fas fa-rocket"></i>
-                    SEO Description Generator
-                </h1>
-                <p class="app-subtitle">AI-powered content generation following brand guidelines</p>
+                <div class="header-left">
+                    <h1 class="app-title">
+                        <i class="fas fa-rocket"></i>
+                        SEO Description Generator
+                    </h1>
+                </div>
+                <div class="header-right">
+                    <span id="costBadge" class="cost-badge" style="display:none;"></span>
+                    <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
             </div>
         </header>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Input Section -->
-            <section class="input-section card">
-                <h2 class="section-title">
-                    <i class="fas fa-keyboard"></i>
-                    Input Configuration
-                </h2>
-                
-                <div class="form-group">
-                    <label for="pageNames" class="form-label">
-                        Page Names
-                        <span class="label-hint">Enter one page name per line (e.g., "Arsenal tickets", "Beyoncé tickets")</span>
-                    </label>
-                    <textarea 
-                        id="pageNames" 
-                        class="form-textarea"
-                        rows="6"
-                        placeholder="Arsenal tickets&#10;Beyoncé tickets&#10;Manchester United tickets"
-                    ></textarea>
+            <div class="content-grid">
+                <!-- Left Column - Input -->
+                <div class="left-column">
+                    <div class="input-card">
+                        <h2 class="card-title">
+                            <i class="fas fa-keyboard"></i>
+                            Keywords
+                        </h2>
+                        
+                        <div class="form-group">
+                            <textarea 
+                                id="pageNames" 
+                                class="form-textarea"
+                                rows="8"
+                                placeholder="Enter one keyword per line&#10;&#10;Example:&#10;Arsenal tickets&#10;Beyoncé tickets&#10;Manchester United tickets"
+                            ></textarea>
+                        </div>
+
+                        <details class="advanced-settings">
+                            <summary>
+                                <i class="fas fa-cog"></i>
+                                Settings
+                            </summary>
+                            
+                            <div class="settings-content">
+                                <div class="settings-row">
+                                    <div class="form-group">
+                                        <label for="location" class="form-label">Target Location</label>
+                                        <select id="location" class="form-select">
+                                            <option value="2826">🇬🇧 United Kingdom</option>
+                                            <option value="2840">🇺🇸 United States</option>
+                                            <option value="2724">🇪🇸 Spain</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="language" class="form-label">Language</label>
+                                        <select id="language" class="form-select">
+                                            <option value="English">English</option>
+                                            <option value="Spanish">Spanish</option>
+                                            <option value="French">French</option>
+                                            <option value="German">German</option>
+                                            <option value="Italian">Italian</option>
+                                            <option value="Portuguese">Portuguese</option>
+                                            <option value="Dutch">Dutch</option>
+                                            <option value="Russian">Russian</option>
+                                            <option value="Japanese">Japanese</option>
+                                            <option value="Chinese">Chinese</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="model" class="form-label">AI Model</label>
+                                    <div class="model-selector">
+                                        <label class="model-option">
+                                            <input type="radio" name="model" value="gpt-4o" checked>
+                                            <div class="model-card" data-tooltip="$2.50 / 1M input • $10 / 1M output">
+                                                <span class="model-icon">🌀</span>
+                                                <span class="model-name">GPT-4o</span>
+                                            </div>
+                                        </label>
+                                        <label class="model-option">
+                                            <input type="radio" name="model" value="gemini-2.0-flash">
+                                            <div class="model-card" data-tooltip="$0.30 / 1M input • $2.50 / 1M output">
+                                                <span class="model-icon">♾️</span>
+                                                <span class="model-name">Gemini Flash</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="toggles-group">
+                                    <label class="toggle-option">
+                                        <input type="checkbox" id="includeSearchVolume" checked>
+                                        <span title="Fetch Google Ads monthly search volume & CPC (may incur extra DataForSEO API cost)">Include Search Volume</span>
+                                    </label>
+                                    <label class="toggle-option">
+                                        <input type="checkbox" id="includeCompetitorAnalysis">
+                                        <span title="Analyze top SERP pages to extract content insights (slower & more token usage)">Analyze Competitors</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </details>
+
+                        <button id="generateBtn" class="btn btn-primary">
+                            <i class="fas fa-magic"></i>
+                            Generate Descriptions
+                        </button>
+                    </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="location" class="form-label">
-                            Target Location
-                            <span class="label-hint">Search volume and SERP data location</span>
-                        </label>
-                        <select id="location" class="form-select">
-                            <option value="2826">United Kingdom</option>
-                            <option value="2840">United States</option>
-                            <option value="2724">Spain</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="language" class="form-label">Language</label>
-                        <select id="language" class="form-select">
-                            <option value="English">English</option>
-                            <option value="Spanish">Spanish</option>
-                            <option value="French">French</option>
-                            <option value="German">German</option>
-                            <option value="Italian">Italian</option>
-                            <option value="Portuguese">Portuguese</option>
-                            <option value="Dutch">Dutch</option>
-                            <option value="Russian">Russian</option>
-                            <option value="Japanese">Japanese</option>
-                            <option value="Chinese">Chinese</option>
-                        </select>
+                <!-- Right Column - Sessions -->
+                <div class="right-column">
+                    <div class="sessions-card">
+                        <h3 class="card-title">
+                            <i class="fas fa-history"></i>
+                            Previous Sessions
+                        </h3>
+                        <div id="sessionsContainer" class="sessions-list">
+                            <div class="empty-state">
+                                <i class="fas fa-clock-rotate-left"></i>
+                                <p>No previous sessions</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="model" class="form-label">
-                            AI Model
-                            <span class="label-hint">Choose based on your needs and budget</span>
-                        </label>
-                        <select id="model" class="form-select">
-                            <option value="gpt-4o">GPT-4o ($2.50/1M input, $10/1M output)</option>
-                            <option value="gemini-2.0-flash">Gemini 2.0 Flash ($0.30/1M input, $2.50/1M output)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="includeSearchVolume" checked>
-                            <span>Include Search Volume</span>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="includeCompetitorAnalysis">
-                            <span>Analyze Competitors</span>
-                        </label>
-                    </div>
-                </div>
-
-                <button id="generateBtn" class="btn btn-primary">
-                    <i class="fas fa-magic"></i>
-                    Generate Descriptions
-                </button>
-            </section>
+            </div>
 
             <!-- Processing Section -->
-            <section id="processingSection" class="processing-section card" style="display: none;">
-                <div class="processing-content">
+            <section id="processingSection" class="processing-overlay" style="display: none;">
+                <div class="processing-card">
                     <div class="spinner"></div>
-                    <h3>Processing Your Request</h3>
-                    <p id="processingStatus">Initializing...</p>
+                    <h3>Generating Descriptions</h3>
+                    <p id="processingStatus">Processing your request...</p>
                     <div class="progress-bar">
                         <div id="progressFill" class="progress-fill"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- Cost Tracker -->
-            <section id="costTracker" class="cost-tracker card" style="display: none;">
-                <h3 class="cost-title">
-                    <i class="fas fa-coins"></i>
-                    Usage & Cost Tracking
-                </h3>
+            <!-- Cost Tracker (Hidden by default) -->
+            <section id="costTracker" class="cost-details" style="display: none;">
                 <div class="cost-grid">
                     <div class="cost-item">
-                        <span class="cost-label">Input Tokens</span>
+                        <span class="cost-label">Input</span>
                         <span class="cost-value" id="inputTokens">0</span>
                     </div>
                     <div class="cost-item">
-                        <span class="cost-label">Output Tokens</span>
+                        <span class="cost-label">Output</span>
                         <span class="cost-value" id="outputTokens">0</span>
                     </div>
                     <div class="cost-item">
-                        <span class="cost-label">Total Tokens</span>
+                        <span class="cost-label">Total</span>
                         <span class="cost-value" id="totalTokens">0</span>
                     </div>
-                    <div class="cost-item highlight">
-                        <span class="cost-label">Estimated Cost</span>
+                    <div class="cost-item">
+                        <span class="cost-label">Cost</span>
                         <span class="cost-value" id="totalCost">$0.00</span>
                     </div>
                 </div>
@@ -153,65 +181,47 @@
 
             <!-- Results Section -->
             <section id="resultsSection" class="results-section" style="display: none;">
-                <h2 class="section-title">
-                    <i class="fas fa-file-alt"></i>
-                    Generated Descriptions
-                </h2>
-                <div id="resultsContainer" class="results-container"></div>
+                <h2 class="results-title">Generated Descriptions</h2>
+                <div id="resultsContainer" class="results-grid"></div>
             </section>
         </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>&copy; 2024 SEO Description Generator v2. Professional content generation tool.</p>
-        </footer>
     </div>
 
     <!-- Result Template -->
     <template id="resultTemplate">
-        <div class="result-card card">
-            <div class="result-header">
+        <article class="result-card">
+            <header class="result-header">
                 <h3 class="result-title">
-                    <i class="fas fa-ticket-alt"></i>
                     <span class="page-name"></span>
                 </h3>
-                <button class="collapse-btn" aria-label="Toggle description">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-            </div>
+                <div class="result-actions">
+                    <button class="icon-btn copy-btn" aria-label="Copy">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </header>
             
             <div class="result-meta">
-                <div class="meta-item">
+                <span class="meta-item">
                     <i class="fas fa-search"></i>
-                    <span class="meta-label">Search Volume:</span>
                     <span class="search-volume">--</span>
-                </div>
-                <div class="meta-item">
+                </span>
+                <span class="meta-item">
                     <i class="fas fa-file-word"></i>
-                    <span class="meta-label">Word Count:</span>
-                    <span class="word-count">--</span>
-                </div>
-                <div class="meta-item">
+                    <span class="word-count">--</span> words
+                </span>
+                <span class="meta-item">
                     <i class="fas fa-coins"></i>
-                    <span class="meta-label">Cost:</span>
                     <span class="generation-cost">--</span>
-                </div>
+                </span>
             </div>
 
             <div class="result-content">
-                <div class="description-container">
-                    <div class="description-text"></div>
-                    <button class="copy-btn" aria-label="Copy description">
-                        <i class="fas fa-copy"></i>
-                        Copy
-                    </button>
-                </div>
-                <div class="competitor-insights" style="display: none;">
-                    <h4>Competitor Insights</h4>
-                    <div class="insights-content"></div>
-                </div>
+                <div class="description-text"></div>
             </div>
-        </div>
+
+            <div class="competitor-logos"></div>
+        </article>
     </template>
 
     <!-- JavaScript -->

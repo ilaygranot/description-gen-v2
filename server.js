@@ -346,6 +346,7 @@ async function processSinglePage(pageName, location, language, includeCompetitor
 
   let searchVolume = null;
   let competitorInsights = null;
+  let competitorDomains = [];
 
   // Parallel data gathering
   const dataPromises = [];
@@ -378,6 +379,14 @@ async function processSinglePage(pageName, location, language, includeCompetitor
           const topUrls = serpResults.organicResults
             .slice(0, SYSTEM_CONFIG.parallel.competitorAnalysis)
             .map(r => r.url);
+
+          competitorDomains = topUrls.map(url => {
+            try {
+              return new URL(url).hostname.replace('www.', '');
+            } catch (_) {
+              return null;
+            }
+          }).filter(Boolean);
           
           if (topUrls.length > 0) {
             const competitorContent = await dataForSEO.getCompetitorContent(topUrls);
@@ -400,6 +409,9 @@ async function processSinglePage(pageName, location, language, includeCompetitor
   // Wait for all data gathering to complete
   await Promise.all(dataPromises);
 
+  // Check if SeatPick already ranks in top 3 SERP results
+  const seatpickTop3 = competitorDomains.some(domain => domain && domain.toLowerCase().includes('seatpick.com'));
+
   // Generate description with retry logic
   const descriptionResult = await aiService.generateWithRetry(
     pageName,
@@ -415,7 +427,9 @@ async function processSinglePage(pageName, location, language, includeCompetitor
     isValidLength: descriptionResult.isValidLength,
     searchVolume: searchVolume?.searchVolume || null,
     usage: descriptionResult.usage,
-    hasCompetitorInsights: !!competitorInsights
+    hasCompetitorInsights: !!competitorInsights,
+    competitorDomains,
+    seatpickTop3
   };
 }
 
