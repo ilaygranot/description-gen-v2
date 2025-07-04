@@ -13,6 +13,7 @@ const path = require('path');
 // Import services and utilities
 const DataForSEOService = require('./services/dataForSEO');
 const OpenAIService = require('./services/openAI');
+const GeminiService = require('./services/gemini');
 const { SYSTEM_CONFIG } = require('./config/constants');
 const { logger } = require('./utils/logger');
 
@@ -23,6 +24,7 @@ const PORT = process.env.PORT || 3000;
 // Initialize services with error handling
 let dataForSEO = null;
 let openAI = null;
+let gemini = null;
 let servicesInitialized = false;
 
 try {
@@ -32,6 +34,13 @@ try {
   } else {
     openAI = new OpenAIService(process.env.OPENAI_API_KEY);
     logger.success('OpenAI service initialized');
+  }
+
+  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
+    logger.warn('Gemini API key not configured. Please add GEMINI_API_KEY to your .env file');
+  } else {
+    gemini = new GeminiService(process.env.GEMINI_API_KEY);
+    logger.success('Gemini service initialized');
   }
 
   if (!process.env.DATAFORSEO_LOGIN || !process.env.DATAFORSEO_PASSWORD || 
@@ -45,7 +54,7 @@ try {
     logger.success('DataForSEO service initialized');
   }
 
-  servicesInitialized = !!(openAI && dataForSEO);
+  servicesInitialized = !!((openAI || gemini) && dataForSEO);
 } catch (error) {
   logger.error('Failed to initialize services', error);
 }
@@ -92,7 +101,8 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     services: {
       dataForSEO: !!dataForSEO,
-      openAI: !!openAI
+      openAI: !!openAI,
+      gemini: !!gemini
     },
     message: servicesInitialized ? 'All services operational' : 'Some services not configured. Check server logs.'
   });
@@ -104,20 +114,26 @@ app.get('/api/health', (req, res) => {
  */
 app.post('/api/generate', async (req, res) => {
   try {
-    // Check if services are available
-    if (!openAI) {
+        const {
+      pages,
+      location = SYSTEM_CONFIG.defaultLocation,
+      language = 'English',
+      includeCompetitorAnalysis = false,
+      includeSearchVolume = true,
+      model = 'gpt-4o' 
+    } = req.body;
+
+    // Check if requested model service is available
+    const isGeminiModel = model && model.startsWith('gemini');
+    const aiService = isGeminiModel ? gemini : openAI;
+    const serviceName = isGeminiModel ? 'Gemini' : 'OpenAI';
+    
+    if (!aiService) {
       return res.status(503).json({
-        error: 'OpenAI service not configured',
-        message: 'Please add your OPENAI_API_KEY to the .env file and restart the server'
+        error: `${serviceName} service not configured`,
+        message: `Please add your ${serviceName === 'Gemini' ? 'GEMINI_API_KEY' : 'OPENAI_API_KEY'} to the .env file and restart the server`
       });
     }
-
-    const { 
-      pages, 
-      language = 'English', 
-      includeCompetitorAnalysis = false,
-      includeSearchVolume = true 
-    } = req.body;
 
     // Validation
     if (!pages || !Array.isArray(pages) || pages.length === 0) {
@@ -137,22 +153,26 @@ app.post('/api/generate', async (req, res) => {
       pageCount: pages.length,
       language,
       includeCompetitorAnalysis,
-      includeSearchVolume
+      includeSearchVolume,
+      model,
+      service: serviceName
     });
 
     // Reset token tracking for this batch
-    openAI.resetUsageTracking();
+    aiService.resetUsageTracking();
 
     // Process pages in parallel (with concurrency limit)
     const results = await processPagesConcurrently(
       pages,
+      location,
       language,
       includeCompetitorAnalysis,
-      includeSearchVolume
+      includeSearchVolume,
+      aiService
     );
 
     // Get final usage summary
-    const usageSummary = openAI.getUsageSummary();
+    const usageSummary = aiService.getUsageSummary();
 
     logger.success('Generation completed', {
       successCount: results.filter(r => r.success).length,
@@ -223,15 +243,20 @@ app.post('/api/search-volume', async (req, res) => {
  */
 app.post('/api/analyze-competitors', async (req, res) => {
   try {
+    const { keyword, location, language, model = 'gpt-4o' } = req.body;
+
+    // Check if requested model service is available
+    const isGeminiModel = model && model.startsWith('gemini');
+    const aiService = isGeminiModel ? gemini : openAI;
+    const serviceName = isGeminiModel ? 'Gemini' : 'OpenAI';
+    
     // Check if services are available
-    if (!dataForSEO || !openAI) {
+    if (!dataForSEO || !aiService) {
       return res.status(503).json({
         error: 'Required services not configured',
-        message: 'Both DataForSEO and OpenAI services are required for competitor analysis. Please configure your .env file.'
+        message: `Both DataForSEO and ${serviceName} services are required for competitor analysis. Please configure your .env file.`
       });
     }
-
-    const { keyword, location, language } = req.body;
 
     if (!keyword) {
       return res.status(400).json({
@@ -252,7 +277,7 @@ app.post('/api/analyze-competitors', async (req, res) => {
     const competitorContent = await dataForSEO.getCompetitorContent(topUrls);
     
     // Analyze content with AI
-    const insights = await openAI.analyzeCompetitorContent(keyword, competitorContent);
+    const insights = await aiService.analyzeCompetitorContent(keyword, competitorContent);
 
     res.json({
       success: true,
@@ -276,7 +301,7 @@ app.post('/api/analyze-competitors', async (req, res) => {
 /**
  * Process multiple pages concurrently with rate limiting
  */
-async function processPagesConcurrently(pages, language, includeCompetitorAnalysis, includeSearchVolume) {
+async function processPagesConcurrently(pages, location, language, includeCompetitorAnalysis, includeSearchVolume, aiService) {
   const results = [];
   const batchSize = SYSTEM_CONFIG.parallel.maxConcurrent;
 
@@ -288,9 +313,11 @@ async function processPagesConcurrently(pages, language, includeCompetitorAnalys
       try {
         const result = await processSinglePage(
           pageName,
+          location,
           language,
           includeCompetitorAnalysis,
-          includeSearchVolume
+          includeSearchVolume,
+          aiService
         );
         return { ...result, success: true };
       } catch (error) {
@@ -313,7 +340,7 @@ async function processPagesConcurrently(pages, language, includeCompetitorAnalys
 /**
  * Process a single page with all features
  */
-async function processSinglePage(pageName, language, includeCompetitorAnalysis, includeSearchVolume) {
+async function processSinglePage(pageName, location, language, includeCompetitorAnalysis, includeSearchVolume, aiService) {
   const pageLogger = logger.child(`[${pageName}]`);
   pageLogger.process('Starting page processing');
 
@@ -325,9 +352,11 @@ async function processSinglePage(pageName, language, includeCompetitorAnalysis, 
 
   // Get search volume if requested
   if (includeSearchVolume && dataForSEO) {
+    pageLogger.info('Starting search volume request', { pageName, location, language });
     dataPromises.push(
-      dataForSEO.getSearchVolume([pageName])
+      dataForSEO.getSearchVolume([pageName], location, language)
         .then(data => {
+          pageLogger.info('Raw search volume response', { data, length: data?.length });
           searchVolume = data[0];
           pageLogger.success('Search volume retrieved', searchVolume);
         })
@@ -340,26 +369,31 @@ async function processSinglePage(pageName, language, includeCompetitorAnalysis, 
   }
 
   // Get competitor analysis if requested
-  if (includeCompetitorAnalysis && process.env.ENABLE_COMPETITOR_ANALYSIS === 'true' && dataForSEO && openAI) {
+  if (includeCompetitorAnalysis && dataForSEO && aiService) {
     dataPromises.push(
       (async () => {
         try {
-          const serpResults = await dataForSEO.getSERPResults(pageName);
+          pageLogger.process('Starting competitor analysis');
+          const serpResults = await dataForSEO.getSERPResults(pageName, location, language);
           const topUrls = serpResults.organicResults
             .slice(0, SYSTEM_CONFIG.parallel.competitorAnalysis)
             .map(r => r.url);
           
           if (topUrls.length > 0) {
             const competitorContent = await dataForSEO.getCompetitorContent(topUrls);
-            competitorInsights = await openAI.analyzeCompetitorContent(pageName, competitorContent);
-            pageLogger.success('Competitor analysis completed');
+            competitorInsights = await aiService.analyzeCompetitorContent(pageName, competitorContent);
+            pageLogger.success('Competitor analysis completed', {
+              competitorsAnalyzed: competitorContent.length
+            });
+          } else {
+            pageLogger.warn('No competitor URLs found for analysis');
           }
         } catch (error) {
           pageLogger.warn('Failed to analyze competitors', error.message);
         }
       })()
     );
-  } else if (includeCompetitorAnalysis && (!dataForSEO || !openAI)) {
+  } else if (includeCompetitorAnalysis && (!dataForSEO || !aiService)) {
     pageLogger.warn('Competitor analysis requested but required services not configured');
   }
 
@@ -367,10 +401,11 @@ async function processSinglePage(pageName, language, includeCompetitorAnalysis, 
   await Promise.all(dataPromises);
 
   // Generate description with retry logic
-  const descriptionResult = await openAI.generateWithRetry(
+  const descriptionResult = await aiService.generateWithRetry(
     pageName,
     language,
-    competitorInsights
+    competitorInsights,
+    searchVolume
   );
 
   return {
@@ -399,7 +434,7 @@ app.listen(PORT, () => {
   logger.info(`Server running on http://localhost:${PORT}`);
   logger.info('Environment', {
     nodeEnv: process.env.NODE_ENV || 'development',
-    competitorAnalysis: process.env.ENABLE_COMPETITOR_ANALYSIS === 'true' ? 'Enabled' : 'Disabled'
+    competitorAnalysis: 'User Controlled'
   });
   
   if (!servicesInitialized) {
@@ -409,9 +444,11 @@ app.listen(PORT, () => {
     logger.info('1. Create a .env file in the root directory');
     logger.info('2. Add your API credentials:');
     logger.info('   OPENAI_API_KEY=your_actual_api_key');
+    logger.info('   GEMINI_API_KEY=your_actual_api_key');
     logger.info('   DATAFORSEO_LOGIN=your_actual_login');
     logger.info('   DATAFORSEO_PASSWORD=your_actual_password');
     logger.info('3. Restart the server');
+    logger.info('Note: At least one AI service (OpenAI or Gemini) is required');
     logger.separator();
   }
 });
@@ -421,6 +458,9 @@ process.on('SIGTERM', () => {
   logger.info('SIGTERM received, shutting down gracefully');
   if (openAI) {
     openAI.dispose();
+  }
+  if (gemini) {
+    gemini.dispose();
   }
   process.exit(0);
 }); 

@@ -4,26 +4,30 @@ A professional AI-powered tool for generating SEO-optimized descriptions followi
 
 ## Features
 
-- **AI-Powered Generation**: Uses OpenAI GPT-4 for high-quality content creation
+- **Multiple AI Models**: Choose between OpenAI GPT-4o or Google Gemini 2.0 Flash
+- **AI-Powered Generation**: High-quality content creation with brand guidelines
+- **Cost-Effective Options**: Gemini offers 8x lower costs than GPT-4o
 - **Brand Guidelines Compliance**: Enforces tone, voice, and content structure rules
 - **Parallel Processing**: Generate descriptions for multiple pages simultaneously
 - **Search Volume Data**: Integration with DataForSEO for keyword metrics
 - **Competitor Analysis** (Optional): Analyze top SERP competitors for content insights
 - **Multi-language Support**: Generate descriptions in 10+ languages
-- **Real-time Cost Tracking**: Monitor token usage and estimated costs
-- **Professional UI**: Clean, responsive design with smooth animations
+- **Real-time Cost Tracking**: Monitor token usage and estimated costs per model
+- **Professional UI**: Clean, responsive design with model selection
 
 ## Prerequisites
 
 - Node.js 16+ and npm
 - DataForSEO account (for search volume and SERP data)
-- OpenAI API key (for content generation)
+- At least one AI service:
+  - OpenAI API key (for GPT-4o model)
+  - Google Gemini API key (for Gemini 2.0 Flash model)
 
 ## Installation
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/ilaygranot/description-gen-v2
 cd description-generator-v2
 ```
 
@@ -38,7 +42,10 @@ npm run setup
 ```
 This will create a `.env` file with placeholders. Edit this file and add your actual API credentials:
 - **OPENAI_API_KEY**: Get from [OpenAI Platform](https://platform.openai.com/api-keys)
+- **GEMINI_API_KEY**: Get from [Google AI Studio](https://makersuite.google.com/app/apikey)
 - **DATAFORSEO_LOGIN & PASSWORD**: Get from [DataForSEO](https://dataforseo.com/)
+
+Note: You need at least one AI service configured (OpenAI or Gemini)
 
 ## Usage
 
@@ -65,10 +72,15 @@ Generate SEO descriptions for multiple pages.
 {
   "pages": ["Arsenal tickets", "Beyoncé tickets"],
   "language": "English",
+  "model": "gpt-4o",
   "includeSearchVolume": true,
   "includeCompetitorAnalysis": false
 }
 ```
+
+**Available Models:**
+- `gpt-4o`: OpenAI GPT-4o ($2.50/1M input, $10/1M output)
+- `gemini-2.0-flash-exp`: Google Gemini 2.0 Flash ($0.30/1M input, $2.50/1M output)
 
 ### `POST /api/search-volume`
 Get search volume data for keywords.
@@ -100,6 +112,12 @@ Analyze top SERP competitors for a keyword.
 ```
 
 ## Key Features Explained
+
+### Multi-Model Support
+- **GPT-4o**: Premium quality with higher cost
+- **Gemini 2.0 Flash**: Cost-effective alternative (8x cheaper on input)
+- Both models follow the same brand guidelines and quality standards
+- Easy switching between models in the UI
 
 ### Brand Guidelines Enforcement
 The system enforces:

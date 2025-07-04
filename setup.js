@@ -43,12 +43,13 @@ DATAFORSEO_PASSWORD=your_dataforseo_password_here
 # Get your API key at https://platform.openai.com/
 OPENAI_API_KEY=your_openai_api_key_here
 
+# Google Gemini API Credentials
+# Get your API key at https://makersuite.google.com/app/apikey
+GEMINI_API_KEY=your_gemini_api_key_here
+
 # Server Configuration
 PORT=3000
 NODE_ENV=development
-
-# Feature Flags
-ENABLE_COMPETITOR_ANALYSIS=true
 `;
 
   try {
@@ -58,9 +59,11 @@ ENABLE_COMPETITOR_ANALYSIS=true
     console.log('1. Open .env file in your editor');
     console.log('2. Replace the placeholder values with your actual API credentials:');
     console.log('   - OPENAI_API_KEY: Get from https://platform.openai.com/api-keys');
+    console.log('   - GEMINI_API_KEY: Get from https://makersuite.google.com/app/apikey');
     console.log('   - DATAFORSEO_LOGIN & PASSWORD: Get from https://dataforseo.com/');
     console.log('3. Save the file');
     console.log('4. Run: npm run dev\n');
+    console.log('Note: You need at least one AI service (OpenAI or Gemini) configured');
   } catch (error) {
     console.error('❌ Error creating .env file:', error.message);
   }

@@ -8,11 +8,13 @@ const { TOKEN_PRICING } = require('../config/constants');
 const { logger } = require('./logger');
 
 class TokenCounter {
-  constructor(model = 'gpt-4-turbo-preview') {
+  constructor(model = 'gpt-4o') {
     this.model = model;
     try {
       // Get the appropriate encoding for the model
-      this.encoding = encoding_for_model(model);
+      // Gemini models use similar tokenization to GPT models for estimation
+      const encodingModel = model.startsWith('gemini') ? 'gpt-4' : model;
+      this.encoding = encoding_for_model(encodingModel);
     } catch (error) {
       logger.warn(`Could not load encoding for model ${model}, using default cl100k_base`, error);
       // Fallback to cl100k_base encoding

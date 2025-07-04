@@ -24,6 +24,7 @@ class SEODescriptionGenerator {
             // Input elements
             pageNamesInput: document.getElementById('pageNames'),
             languageSelect: document.getElementById('language'),
+            modelSelect: document.getElementById('model'),
             searchVolumeCheckbox: document.getElementById('includeSearchVolume'),
             competitorCheckbox: document.getElementById('includeCompetitorAnalysis'),
             generateBtn: document.getElementById('generateBtn'),
@@ -81,7 +82,9 @@ class SEODescriptionGenerator {
         // Get configuration
         const config = {
             pages,
+            location: parseInt(document.getElementById('location').value),
             language: this.elements.languageSelect.value,
+            model: this.elements.modelSelect.value,
             includeSearchVolume: this.elements.searchVolumeCheckbox.checked,
             includeCompetitorAnalysis: this.elements.competitorCheckbox.checked
         };

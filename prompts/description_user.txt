@@ -1,0 +1,17 @@
+Write an SEO-optimized description for: "{{pageName}}"
+
+
+{{#competitorInsights}}
+Competitor Analysis Insights:
+{{competitorInsights}}
+
+Use these insights to ensure our description covers important topics while maintaining our unique brand voice and perspective.
+{{/competitorInsights}}
+
+Remember: 
+- Bold the first mention of "{{pageName}}"
+- Write exactly {{minWords}}-{{maxWords}} words
+- Focus on the fan experience and ticket-buying journey
+
+---
+(Add copy examples or additional guidance here if needed.) 

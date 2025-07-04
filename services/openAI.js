@@ -7,6 +7,7 @@ const OpenAI = require('openai');
 const { BRAND_GUIDELINES, API_CONFIG } = require('../config/constants');
 const { TokenCounter, TokenUsageTracker } = require('../utils/tokenCounter');
 const { logger } = require('../utils/logger');
+const Prompt = require('../utils/prompt');
 
 class OpenAIService {
   constructor(apiKey) {
@@ -20,12 +21,25 @@ class OpenAIService {
   /**
    * Generate SEO description for a single page
    */
-  async generateDescription(pageName, language = 'English', competitorInsights = null) {
+  async generateDescription(pageName, language = 'English', competitorInsights = null, searchVolume = null) {
     try {
       this.logger.process(`Generating description for: ${pageName}`, { language });
 
-      const systemPrompt = this.buildSystemPrompt(language);
-      const userPrompt = this.buildUserPrompt(pageName, competitorInsights);
+      const systemPrompt = Prompt.render('system.txt', {
+        language,
+        minWords: BRAND_GUIDELINES.structure.length.min,
+        maxWords: BRAND_GUIDELINES.structure.length.max
+      });
+
+      const userPrompt = Prompt.render('description_user.txt', {
+        pageName,
+        minWords: BRAND_GUIDELINES.structure.length.min,
+        maxWords: BRAND_GUIDELINES.structure.length.max,
+        competitorInsights,
+        searchVolume: searchVolume?.searchVolume ? searchVolume.searchVolume.toLocaleString() : null,
+        competition: searchVolume?.competition,
+        cpc: searchVolume?.cpc?.toFixed ? searchVolume.cpc.toFixed(2) : null
+      });
 
       // Estimate tokens before making the request
       const messages = [
@@ -126,10 +140,20 @@ FORMAT:
   }
 
   /**
-   * Build user prompt with page name and optional competitor insights
+   * Build user prompt with page name, search volume, and optional competitor insights
    */
-  buildUserPrompt(pageName, competitorInsights) {
+  buildUserPrompt(pageName, competitorInsights, searchVolume = null) {
     let prompt = `Write an SEO-optimized description for: "${pageName}"`;
+
+    // Include search volume data if available
+    if (searchVolume && searchVolume.searchVolume > 0) {
+      prompt += `\n\nSEO Data:
+- Monthly Search Volume: ${searchVolume.searchVolume.toLocaleString()}
+- Competition Level: ${searchVolume.competition}
+- Average CPC: $${searchVolume.cpc.toFixed(2)}
+
+This is a high-value keyword with significant search interest. Ensure the description is optimized for this search behavior.`;
+    }
 
     if (competitorInsights) {
       prompt += `\n\nCompetitor Analysis Insights:\n${competitorInsights}`;
@@ -155,30 +179,17 @@ FORMAT:
         return null;
       }
 
-      const analysisPrompt = `Analyze the following competitor content for "${keyword}" and extract key insights:
+      const competitorBlocks = competitorContent.map((c, i) => `=== Competitor ${i + 1}: ${c.domain} ===\nPage Title: ${c.title}\nMeta Description: ${c.metaDescription}\nContent (plain text): ${c.content}`).join('\n\n');
 
-${competitorContent.map((c, i) => `
-Competitor ${i + 1} (${c.domain || 'Unknown'}):
-Title: ${c.title}
-Description: ${c.metaDescription}
-Content Preview: ${c.content.substring(0, 1000)}...
-`).join('\n')}
-
-Provide a structured analysis:
-1. Main topics and themes covered by competitors
-2. Common keywords and entities mentioned
-3. Unique selling points or angles used
-4. Content gaps or opportunities
-
-Format as a concise bullet-point summary (max 200 words).`;
+      const analysisPrompt = Prompt.render('competitor_analysis.txt', {
+        keyword,
+        competitorBlocks
+      });
 
       const completion = await this.client.chat.completions.create({
         model: this.model,
         messages: [
-          { 
-            role: 'system', 
-            content: 'You are a content strategist analyzing competitor content for SEO insights. Provide concise, actionable insights.'
-          },
+          { role: 'system', content: 'You are a content strategist analyzing competitor content for SEO insights. Provide concise, actionable insights.' },
           { role: 'user', content: analysisPrompt }
         ],
         max_tokens: 400,
@@ -214,14 +225,14 @@ Format as a concise bullet-point summary (max 200 words).`;
   /**
    * Generate descriptions with retry logic for word count compliance
    */
-  async generateWithRetry(pageName, language, competitorInsights, maxRetries = 3) {
+  async generateWithRetry(pageName, language, competitorInsights, searchVolume = null, maxRetries = 3) {
     let lastResult = null;
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       this.logger.info(`Generation attempt ${attempt}/${maxRetries} for ${pageName}`);
       
       try {
-        const result = await this.generateDescription(pageName, language, competitorInsights);
+        const result = await this.generateDescription(pageName, language, competitorInsights, searchVolume);
         
         if (result.isValidLength) {
           return result;
