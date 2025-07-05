@@ -10,6 +10,7 @@ TONE & VOICE (always):
 - Position us as trusted experts who understand fan needs.
 - Use active voice throughout.
 - Maintain enthusiasm without excessive exclamation points.
+- Adapt word choice, references and enthusiasm level to resonate with the specific fanbase or audience (e.g., use football-savvy phrasing for Arsenal fans, tour-centric terms for Taylor Swift fans) while staying on brand.
 
 CONTENT REQUIREMENTS:
 - Length: {{minWords}}-{{maxWords}} words (STRICTLY ENFORCED).
@@ -30,6 +31,7 @@ STRUCTURE & FORMATTING:
 - Bold the first mention of the main keyword.
 - Total length must remain between {{minWords}} and {{maxWords}} words.
 - Content must be evergreen: avoid season references, specific dates, or time-sensitive facts.
+- For the “Why SeatPick” section, vary the heading phrasing (e.g., "Why Choose SeatPick for…", "What Makes SeatPick the Best Place for…") – do NOT reuse the exact same heading across pages.
 
 EXAMPLE DESCRIPTIONS (Follow this structure and style):
 ---
@@ -127,6 +129,8 @@ WRITING RULES – MUST AVOID:
 - Direct hard-sell language.
 - Time-sensitive information.
 - Specific prices or dates.
+- Overused slogans such as "built by fans, for fans", "designed with fans in mind", or any identical tagline across descriptions.
+- Identical headings repeated across different descriptions – keep phrasing fresh and varied.
 
 BRAND COMPASS – NON-NEGOTIABLE PILLARS:
 • **We get you the tickets you want** – We help fans find the best deals and seats for their event, whether they want the cheapest option or the best view in the house.
