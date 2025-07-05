@@ -2,7 +2,11 @@ Write an SEO-optimized description for: "{{pageName}}"
 
 Follow the structure from the examples in the system prompt. The description should include:
 1.  A two-paragraph promotional opening explaining why SeatPick is the best place to buy tickets for "{{pageName}}".
-2.  Headings to structure the content, such as 'About {{pageName}}', a creatively phrased *Why SeatPick* section (e.g., 'Why Choose SeatPick for {{pageName}} Tickets?' or 'What Makes SeatPick the Best Place for {{pageName}} Tickets?'), and '{{pageName}} History & Key Facts'. Avoid reusing identical heading wording across different pages.
+2.  Headings to structure the content, such as:
+   • 'About {{pageName}}'
+   • A creatively phrased *Why SeatPick* section (e.g., 'Why Choose SeatPick for {{pageName}}?' or 'What Makes SeatPick the Best Place for {{pageName}} Tickets?')
+   • 'History & Key Facts' (use common-sense naming – do NOT prepend '{{pageName}}' if it already contains the word “Tickets”).
+   Avoid reusing identical heading wording across different pages.
 3.  Under 'History & Key Facts', include relevant subheadings (e.g., Rivalries, Famous Players, Key Moments).
 
 {{#competitorInsights}}
