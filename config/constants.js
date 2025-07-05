@@ -4,55 +4,13 @@
  */
 
 const BRAND_GUIDELINES = {
-  // Business Model Context
-  businessModel: {
-    type: "Ticket Aggregation Platform",
-    description: "We aggregate tickets from multiple sources to provide the best selection and prices",
-    emphasis: "We don't sell tickets directly - we help fans find the best available options"
-  },
-
-  // Tone and Voice Guidelines
-  tone: {
-    primary: "Conversational and relatable",
-    characteristics: [
-      "Write as fellow fans, not corporate marketers",
-      "Be passionate and knowledgeable about events",
-      "Position as trusted experts who understand fan needs",
-      "Use active voice throughout",
-      "Maintain enthusiasm without excessive exclamation points"
-    ]
-  },
-
-  // Content Structure Rules
+  // Word count limits for content validation
   structure: {
-    length: { min: 350, max: 500 },
-    format: {
-      firstMention: "Bold the first mention of main keywords",
-      headings: "Use sentence case for all headings",
-      evergreen: "Avoid dates, prices, or time-sensitive information"
-    }
+    length: { min: 350, max: 500 }
   },
 
-  // Writing Style Guidelines
-  style: {
-    avoid: [
-      "Excessive exclamation points (max 1-2 per description)",
-      "Generic marketing speak",
-      "Direct selling language",
-      "Time-sensitive information",
-      "Specific prices or dates"
-    ],
-    include: [
-      "Fan perspective and emotions",
-      "Event atmosphere descriptions",
-      "Venue information when relevant",
-      "Artist/team history and significance",
-      "Ticket-buying guidance"
-    ]
-  },
-
-  // Default location and language used throughout the app
-  defaultLocation: 2826, // United Kingdom
+  // Default location and language
+  defaultLocation: 2826,
   defaultLanguage: 'en'
 };
 
