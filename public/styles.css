@@ -293,13 +293,17 @@ body {
 }
 
 .model-card {
-    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
     border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
-    text-align: center;
+    text-align: left;
     cursor: pointer;
     transition: all var(--transition-base);
     position: relative;
+    min-height: 56px;
 }
 
 .model-card:hover {
@@ -313,13 +317,14 @@ body {
 }
 
 .model-icon {
-    font-size: 1.5rem;
-    display: block;
-    margin-bottom: var(--spacing-xs);
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 .model-name {
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
 }
 
@@ -413,6 +418,7 @@ body {
     cursor: pointer;
     transition: all var(--transition-fast);
     border: 1px solid transparent;
+    position: relative;
 }
 
 .session-item:hover {
@@ -661,6 +667,18 @@ body {
     margin-bottom: 0;
 }
 
+.description-text ul {
+    margin-left: var(--spacing-lg);
+    padding-left: var(--spacing-sm);
+    list-style: disc inside;
+    line-height: 1.7;
+    margin-bottom: var(--spacing-md);
+}
+
+.description-text ul li {
+    margin-bottom: 0.25rem;
+}
+
 .seatpick-warning {
     background: var(--warning-bg, #fffae6);
     color: var(--warning-color, #d97706);
@@ -677,6 +695,29 @@ body {
 
 .seatpick-warning i {
     font-size: 0.875rem;
+}
+
+.delete-session {
+    position: absolute;
+    right: var(--spacing-xs);
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    opacity: 0.6;
+    padding: 0;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.delete-session:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.delete-session i {
+    font-size: 0.75rem;
 }
 
 /* Responsive */

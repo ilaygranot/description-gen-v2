@@ -423,12 +423,58 @@ class SEODescriptionGenerator {
      * Format description text (convert markdown to HTML)
      */
     formatDescription(text) {
-        // Bold conversion first
-        const bolded = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // 1. Bold (**text** -> <strong>)
+        let processed = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-        // Split into paragraphs on double newline
-        const paragraphs = bolded.split(/\n{2,}/).map(p => p.trim());
-        return paragraphs.map(p => `<p>${p}</p>`).join('');
+        // 2. Split into individual lines for easier parsing
+        const lines = processed.split(/\n/);
+
+        let html = '';
+        let inList = false;
+
+        lines.forEach(rawLine => {
+            const line = rawLine.trim();
+
+            // Handle empty lines (paragraph / list separation)
+            if (line === '') {
+                if (inList) {
+                    html += '</ul>';
+                    inList = false;
+                }
+                return;
+            }
+
+            // Headings
+            if (line.startsWith('### ')) {
+                if (inList) { html += '</ul>'; inList = false; }
+                html += `<h3>${line.substring(4).trim()}</h3>`;
+            } else if (line.startsWith('## ')) {
+                if (inList) { html += '</ul>'; inList = false; }
+                html += `<h2>${line.substring(3).trim()}</h2>`;
+            } else if (line.startsWith('# ')) {
+                if (inList) { html += '</ul>'; inList = false; }
+                html += `<h1>${line.substring(2).trim()}</h1>`;
+            }
+            // Bullet list items
+            else if (/^([*\-•])\s+/.test(line)) {
+                if (!inList) {
+                    html += '<ul>';
+                    inList = true;
+                }
+                // Remove leading bullet symbol and whitespace (handles *, -, •)
+                html += `<li>${line.replace(/^([*\-•])\s+/, '')}</li>`;
+            }
+            // Regular paragraph
+            else {
+                if (inList) { html += '</ul>'; inList = false; }
+                html += `<p>${line}</p>`;
+            }
+        });
+
+        // Close any open list
+        if (inList) html += '</ul>';
+
+        return html;
     }
 
     /**
@@ -536,11 +582,35 @@ class SEODescriptionGenerator {
             div.className = 'session-item';
             div.title = new Date(session.timestamp).toLocaleString();
             div.textContent = session.pages.join(', ');
+
+            // Delete button
+            const delBtn = document.createElement('button');
+            delBtn.className = 'delete-session';
+            delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const confirmed = confirm('Delete this session?');
+                if (confirmed) {
+                    this.deleteSession(session.id);
+                }
+            });
+            div.appendChild(delBtn);
+
             div.addEventListener('click', () => {
                 this.showSession(session);
             });
+
             this.elements.sessionsContainer.appendChild(div);
         });
+    }
+
+    /**
+     * Delete a session from localStorage by ID
+     */
+    deleteSession(id) {
+        const sessions = this.getStoredSessions().filter(s => s.id !== id);
+        localStorage.setItem('seoGenSessions', JSON.stringify(sessions));
+        this.renderSessions(sessions);
     }
 
     showSession(session) {

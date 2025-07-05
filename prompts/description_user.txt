@@ -1,17 +1,22 @@
 Write an SEO-optimized description for: "{{pageName}}"
 
+Follow the structure from the examples in the system prompt. The description should include:
+1.  A two-paragraph promotional opening explaining why SeatPick is the best place to buy tickets for "{{pageName}}".
+2.  Headings to structure the content, such as 'About {{pageName}}', 'Why Buy Tickets via SeatPick?', and '{{pageName}} History & Key Facts'.
+3.  Under 'History & Key Facts', include relevant subheadings (e.g., Rivalries, Famous Players, Key Moments).
 
 {{#competitorInsights}}
 Competitor Analysis Insights:
 {{competitorInsights}}
 
-Use these insights to ensure our description covers important topics while maintaining our unique brand voice and perspective.
+Use these insights to enrich the content, especially the history and key facts, while maintaining our unique brand voice and perspective.
 {{/competitorInsights}}
 
 Remember: 
 - Bold the first mention of "{{pageName}}"
 - Write exactly {{minWords}}-{{maxWords}} words
-- Focus on the fan experience and ticket-buying journey
+- Focus on the fan experience and the value SeatPick provides.
+- Use Markdown for all formatting (headings, bolding, lists).
 
 ---
 (Add copy examples or additional guidance here if needed.) 
