@@ -14,4 +14,3 @@ Extract ONLY the most relevant insights for SEO strategy:
 Provide a concise 3-4 sentence summary focusing on actionable insights for content strategy.
 
 ---
-(Feel free to tweak this template; the model will always load the latest version.) 
