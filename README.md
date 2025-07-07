@@ -35,7 +35,7 @@ A professional AI-powered tool for generating SEO-optimized descriptions followi
 1. Clone the repository:
 ```bash
 git clone https://github.com/ilaygranot/description-gen-v2
-cd description-generator-v2
+cd description-gen-v2
 ```
 
 2. Install dependencies:
