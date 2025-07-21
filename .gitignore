@@ -67,3 +67,9 @@ yarn-error.log*
 
 # Optional REPL history
 .node_repl_history 
+.vercel
+
+# Large documentation files (keep local only)
+VERCEL_PRODUCTION_GUIDE.md
+DEPLOYMENT.md
+CLAUDE.md

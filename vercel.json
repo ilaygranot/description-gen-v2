@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/((?!api/.*).*)",
+      "destination": "/public/$1"
+    }
+  ],
+  "functions": {
+    "api/generate.js": {
+      "maxDuration": 60
+    },
+    "api/analyze-competitors.js": {
+      "maxDuration": 60
+    },
+    "api/search-volume.js": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With, Content-Type, Authorization"
+        }
+      ]
+    }
+  ]
+}

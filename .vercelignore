@@ -1,0 +1,40 @@
+# Documentation files (won't be deployed)
+*.md
+!README.md
+
+# Development files
+.env.local
+.env.example
+*.log
+npm-debug.log*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+__tests__/
+*.test.js
+*.spec.js
+coverage/
+
+# Development dependencies
+node_modules/
+.git/
+
+# Large documentation
+VERCEL_PRODUCTION_GUIDE.md
+DEPLOYMENT.md
+CLAUDE.md
+
+# Original server (not needed for Vercel)
+server.js
+
+# Setup scripts
+setup.js
